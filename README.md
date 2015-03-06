@@ -11,6 +11,7 @@ Mal is implemented in 27 different languages:
 * C#
 * Clojure
 * CoffeeScript
+* Erlang
 * Forth
 * Go
 * Haskell
@@ -107,6 +108,15 @@ lein with-profile +stepX trampoline run
 sudo npm install -g coffee-script
 cd coffee
 coffee ./stepX_YYY
+```
+
+### Erlang
+
+```
+cd erlang
+make
+./stepX_YYY
+
 ```
 
 ### Forth
@@ -448,4 +458,3 @@ make stats-lisp^js
 
 Mal (make-a-lisp) is licensed under the MPL 2.0 (Mozilla Public
 License 2.0). See LICENSE.txt for more details.
-
