@@ -10,8 +10,8 @@ PYTHON = python
 # Settings
 #
 
-IMPLS = bash c clojure coffee cpp cs erlang factor forth go haskell java \
-	julia js lua make mal ocaml matlab miniMAL nim perl php ps \
+IMPLS = bash c clojure coffee cpp cs erlang erlang_alt factor forth go haskell \
+	java julia js lua make mal ocaml matlab miniMAL nim perl php ps \
 	python r racket ruby rust scala swift vb guile
 
 step0 = step0_repl
@@ -52,39 +52,40 @@ EXCLUDE_PERFS = perf^mal  # TODO: fix this
 
 STEP_TEST_FILES = $(strip $(wildcard $(1)/tests/$($(2)).mal) $(wildcard tests/$($(2)).mal))
 
-bash_STEP_TO_PROG =    bash/$($(1)).sh
-c_STEP_TO_PROG =       c/$($(1))
-clojure_STEP_TO_PROG = clojure/src/$($(1)).clj
-coffee_STEP_TO_PROG =  coffee/$($(1)).coffee
-cpp_STEP_TO_PROG =     cpp/$($(1))
-cs_STEP_TO_PROG =      cs/$($(1)).exe
-erlang_STEP_TO_PROG =  erlang/$($(1))
-factor_STEP_TO_PROG =  factor/src/$($(1))/$($(1)).factor
-forth_STEP_TO_PROG =   forth/$($(1)).fs
-go_STEP_TO_PROG =      go/$($(1))
-java_STEP_TO_PROG =    java/src/main/java/mal/$($(1)).java
-haskell_STEP_TO_PROG = haskell/$($(1))
-julia_STEP_TO_PROG =   julia/$($(1)).jl
-js_STEP_TO_PROG =      js/$($(1)).js
-lua_STEP_TO_PROG =     lua/$($(1)).lua
-make_STEP_TO_PROG =    make/$($(1)).mk
-mal_STEP_TO_PROG =     mal/$($(1)).mal
-ocaml_STEP_TO_PROG =   ocaml/$($(1))
-matlab_STEP_TO_PROG =  matlab/$($(1)).m
-miniMAL_STEP_TO_PROG = miniMAL/$($(1)).json
-nim_STEP_TO_PROG =     nim/$($(1))
-perl_STEP_TO_PROG =    perl/$($(1)).pl
-php_STEP_TO_PROG =     php/$($(1)).php
-ps_STEP_TO_PROG =      ps/$($(1)).ps
-python_STEP_TO_PROG =  python/$($(1)).py
-r_STEP_TO_PROG =       r/$($(1)).r
-racket_STEP_TO_PROG =  racket/$($(1)).rkt
-ruby_STEP_TO_PROG =    ruby/$($(1)).rb
-rust_STEP_TO_PROG =    rust/target/release/$($(1))
-scala_STEP_TO_PROG =   scala/$($(1)).scala
-swift_STEP_TO_PROG =   swift/$($(1))
-vb_STEP_TO_PROG =      vb/$($(1)).exe
-guile_STEP_TO_PROG =   guile/$($(1)).scm
+bash_STEP_TO_PROG =       bash/$($(1)).sh
+c_STEP_TO_PROG =          c/$($(1))
+clojure_STEP_TO_PROG =    clojure/src/$($(1)).clj
+coffee_STEP_TO_PROG =     coffee/$($(1)).coffee
+cpp_STEP_TO_PROG =        cpp/$($(1))
+cs_STEP_TO_PROG =         cs/$($(1)).exe
+erlang_STEP_TO_PROG =     erlang/$($(1))
+erlang_alt_STEP_TO_PROG = erlang_alt/$($(1)).erl
+factor_STEP_TO_PROG =     factor/src/$($(1))/$($(1)).factor
+forth_STEP_TO_PROG =      forth/$($(1)).fs
+go_STEP_TO_PROG =         go/$($(1))
+java_STEP_TO_PROG =       java/src/main/java/mal/$($(1)).java
+haskell_STEP_TO_PROG =    haskell/$($(1))
+julia_STEP_TO_PROG =      julia/$($(1)).jl
+js_STEP_TO_PROG =         js/$($(1)).js
+lua_STEP_TO_PROG =        lua/$($(1)).lua
+make_STEP_TO_PROG =       make/$($(1)).mk
+mal_STEP_TO_PROG =        mal/$($(1)).mal
+ocaml_STEP_TO_PROG =      ocaml/$($(1))
+matlab_STEP_TO_PROG =     matlab/$($(1)).m
+miniMAL_STEP_TO_PROG =    miniMAL/$($(1)).json
+nim_STEP_TO_PROG =        nim/$($(1))
+perl_STEP_TO_PROG =       perl/$($(1)).pl
+php_STEP_TO_PROG =        php/$($(1)).php
+ps_STEP_TO_PROG =         ps/$($(1)).ps
+python_STEP_TO_PROG =     python/$($(1)).py
+r_STEP_TO_PROG =          r/$($(1)).r
+racket_STEP_TO_PROG =     racket/$($(1)).rkt
+ruby_STEP_TO_PROG =       ruby/$($(1)).rb
+rust_STEP_TO_PROG =       rust/target/release/$($(1))
+scala_STEP_TO_PROG =      scala/$($(1)).scala
+swift_STEP_TO_PROG =      swift/$($(1))
+vb_STEP_TO_PROG =         vb/$($(1)).exe
+guile_STEP_TO_PROG =      guile/$($(1)).scm
 
 # Needed some argument munging
 COMMA = ,
@@ -92,41 +93,42 @@ noop =
 SPACE = $(noop) $(noop)
 export FACTOR_ROOTS := src
 
-bash_RUNSTEP =    bash ../$(2) $(3)
-c_RUNSTEP =       ../$(2) $(3)
-clojure_RUNSTEP = lein with-profile +$(1) trampoline run $(3)
-coffee_RUNSTEP =  coffee ../$(2) $(3)
-cpp_RUNSTEP =     ../$(2) $(3)
-cs_RUNSTEP =      mono ../$(2) --raw $(3)
-erlang_RUNSTEP =  ../$(2) $(3)
-factor_RUNSTEP =  factor ../$(2) $(3)
-forth_RUNSTEP =   gforth ../$(2) $(3)
-go_RUNSTEP =      ../$(2) $(3)
-haskell_RUNSTEP = ../$(2) $(3)
-java_RUNSTEP =    mvn -quiet exec:java -Dexec.mainClass="mal.$($(1))" $(if $(3), -Dexec.args="$(3)",)
-julia_RUNSTEP =   ../$(2) $(3)
-js_RUNSTEP =      node ../$(2) $(3)
-lua_RUNSTEP =     ../$(2) $(3)
-make_RUNSTEP =    make -f ../$(2) $(3)
-mal_RUNSTEP =     $(call $(MAL_IMPL)_RUNSTEP,$(1),$(call $(MAL_IMPL)_STEP_TO_PROG,stepA),../$(2),")  #"
-ocaml_RUNSTEP =   ../$(2) $(3)
-matlab_args =     $(subst $(SPACE),$(COMMA),$(foreach x,$(strip $(1)),'$(x)'))
-matlab_RUNSTEP =  matlab -nodisplay -nosplash -nodesktop -nojvm -r "$($(1))($(call matlab_args,$(3)));quit;"
-miniMAL_RUNSTEP = miniMAL ../$(2) $(3)
-nim_RUNSTEP =     ../$(2) $(3)
-perl_RUNSTEP =    perl ../$(2) $(3)
-php_RUNSTEP =     php ../$(2) $(3)
-ps_RUNSTEP =      $(4)gs -q -I./ -dNODISPLAY -- ../$(2) $(3)$(4)
-python_RUNSTEP =  $(PYTHON) ../$(2) $(3)
-r_RUNSTEP =       Rscript ../$(2) $(3)
-racket_RUNSTEP =  ../$(2) $(3)
-ruby_RUNSTEP =    ruby ../$(2) $(3)
-rust_RUNSTEP =    ../$(2) $(3)
-scala_RUNSTEP =   sbt 'run-main $($(1))$(if $(3), $(3),)'
-swift_RUNSTEP =   ../$(2) $(3)
-vb_RUNSTEP =      mono ../$(2) --raw $(3)
+bash_RUNSTEP =       bash ../$(2) $(3)
+c_RUNSTEP =          ../$(2) $(3)
+clojure_RUNSTEP =    lein with-profile +$(1) trampoline run $(3)
+coffee_RUNSTEP =     coffee ../$(2) $(3)
+cpp_RUNSTEP =        ../$(2) $(3)
+cs_RUNSTEP =         mono ../$(2) --raw $(3)
+erlang_RUNSTEP =     ../$(2) $(3)
+erlang_alt_RUNSTEP = ../$(2) $(3)
+factor_RUNSTEP =     factor ../$(2) $(3)
+forth_RUNSTEP =      gforth ../$(2) $(3)
+go_RUNSTEP =         ../$(2) $(3)
+haskell_RUNSTEP =    ../$(2) $(3)
+java_RUNSTEP =       mvn -quiet exec:java -Dexec.mainClass="mal.$($(1))" $(if $(3), -Dexec.args="$(3)",)
+julia_RUNSTEP =      ../$(2) $(3)
+js_RUNSTEP =         node ../$(2) $(3)
+lua_RUNSTEP =        ../$(2) $(3)
+make_RUNSTEP =       make -f ../$(2) $(3)
+mal_RUNSTEP =        $(call $(MAL_IMPL)_RUNSTEP,$(1),$(call $(MAL_IMPL)_STEP_TO_PROG,stepA),../$(2),")  #"
+ocaml_RUNSTEP =      ../$(2) $(3)
+matlab_args =        $(subst $(SPACE),$(COMMA),$(foreach x,$(strip $(1)),'$(x)'))
+matlab_RUNSTEP =     matlab -nodisplay -nosplash -nodesktop -nojvm -r "$($(1))($(call matlab_args,$(3)));quit;"
+miniMAL_RUNSTEP =    miniMAL ../$(2) $(3)
+nim_RUNSTEP =        ../$(2) $(3)
+perl_RUNSTEP =       perl ../$(2) $(3)
+php_RUNSTEP =        php ../$(2) $(3)
+ps_RUNSTEP =         $(4)gs -q -I./ -dNODISPLAY -- ../$(2) $(3)$(4)
+python_RUNSTEP =     $(PYTHON) ../$(2) $(3)
+r_RUNSTEP =          Rscript ../$(2) $(3)
+racket_RUNSTEP =     ../$(2) $(3)
+ruby_RUNSTEP =       ruby ../$(2) $(3)
+rust_RUNSTEP =       ../$(2) $(3)
+scala_RUNSTEP =      sbt 'run-main $($(1))$(if $(3), $(3),)'
+swift_RUNSTEP =      ../$(2) $(3)
+vb_RUNSTEP =         mono ../$(2) --raw $(3)
 # needs TERM=dumb to work with readline
-guile_RUNSTEP =   guile -L ../guile ../$(2) $(3)
+guile_RUNSTEP =      guile -L ../guile ../$(2) $(3)
 
 # Extra options to pass to runtest.py
 mal_TEST_OPTS = --start-timeout 60 --test-timeout 120
