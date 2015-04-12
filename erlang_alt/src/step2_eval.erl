@@ -58,7 +58,7 @@ eval(Expr, Env) when is_map(Expr) ->
 eval([Fun | Args], Env) ->
     F = eval(Fun, Env),
     A = eval_seq(Args, Env),
-    apply(F, A).
+    F(A).
 
 -spec eval_seq(Exprs :: [expr()], Env :: env()) -> [expr()].
 eval_seq(Exprs, Env) ->

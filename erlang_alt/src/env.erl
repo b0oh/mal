@@ -1,6 +1,6 @@
 -module(env).
 -include("mal.hrl").
--export([new/0, lookup/2, add_binding/3]).
+-export([new/0, lookup/2, update_binding/3]).
 -export_type([env/0]).
 
 -type env() :: map().
@@ -16,6 +16,6 @@ lookup(Var, Env) ->
         error       -> not_found
     end.
 
--spec add_binding(Var :: expr(), Val :: expr(), Env :: env()) -> env().
-add_binding(Var, Val, Env) ->
+-spec update_binding(Var :: expr(), Val :: expr(), Env :: env()) -> env().
+update_binding(Var, Val, Env) ->
     maps:put(Var, Val, Env).

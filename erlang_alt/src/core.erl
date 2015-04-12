@@ -13,14 +13,14 @@ println(String) ->
 
 -spec add_builtins(Env :: env:env()) -> env:env().
 add_builtins(Env0) ->
-    Builtins = #{'+' => fun plus/2,
-                 '-' => fun minus/2,
-                 '*' => fun multiply/2,
-                 '/' => fun divide/2},
-    maps:fold(fun(K, F, Env) -> env:add_binding(K, F, Env) end,
+    Builtins = #{'+' => fun plus/1,
+                 '-' => fun minus/1,
+                 '*' => fun multiply/1,
+                 '/' => fun divide/1},
+    maps:fold(fun(K, F, Env) -> env:update_binding(K, F, Env) end,
               Env0, Builtins).
 
-plus(X, Y) -> X + Y.
-minus(X, Y) -> X - Y.
-multiply(X, Y) -> X * Y.
-divide(X, Y) -> round(X / Y).
+plus([X, Y]) -> X + Y.
+minus([X, Y]) -> X - Y.
+multiply([X, Y]) -> X * Y.
+divide([X, Y]) -> round(X / Y).
