@@ -1,8 +1,6 @@
 -module(printer).
+-include("mal.hrl").
 -export([print_expr/1]).
-
--type expr() :: reader:expr().
--type bin() :: unicode:unicode_binary().
 
 -spec print_expr(Expr :: expr()) -> bin().
 print_expr(Expr) when is_atom(Expr) ->

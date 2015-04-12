@@ -1,6 +1,6 @@
 -module(reader).
+-include("mal.hrl").
 -export([read_str/1]).
--export_type([expr/0]).
 
 -define(token_regex, <<"[\\s ,]*(~@|[\\[\\]{}()'`~@]|\"(?:[\\\\].|[^\\\\\"])*\"|;.*|[^\\s \\[\\]{}()'\"`~@,;]*)">>). % '
 -define(is_digit(C), C >= $0, C =< $9).
@@ -9,17 +9,13 @@
 -define(ok(Expr, Tokens), {ok, Expr, Tokens}).
 -define(err(Error), {error, Error}).
 
--type bin() :: unicode:unicode_binary().
 -type token() :: bin().
 -type tokens() :: [token()].
--type vec() :: {vector, [expr()]}.
--type mal_string() :: bin().
--type expr() :: integer() | float() | mal_string() | atom() | [expr()] | vec() | map().
 -type reader_success() :: {ok, expr(), tokens()}.
--type reader_error() :: {error, iolist()}.
+-type reader_error() :: {error, iodata()}.
 -type reader_result() :: reader_success() | reader_error().
 
--spec read_str(String :: bin()) -> {ok, expr()} | {error, iolist()}.
+-spec read_str(String :: bin()) -> {ok, expr()} | {error, iodata()}.
 read_str(String) ->
     Tokens0 = re:split(String, ?token_regex),
     Tokens1 = [T || T <- Tokens0, T =/= <<>>],
@@ -156,18 +152,22 @@ read_string(<<>>, _)  ->
 -spec read_symbol(Symbol :: token(), Tokens :: tokens()) -> reader_result().
 read_symbol(Symbol, Tokens) -> ?ok(binary_to_atom(Symbol, utf8), Tokens).
 
-
+-spec close_paren(OpenParen :: token()) -> token().
 close_paren(<<"(">>) -> <<")">>;
 close_paren(<<"[">>) -> <<"]">>;
 close_paren(<<"{">>) -> <<"}">>.
 
+-spec list_handler(OpenParen :: token()) -> fun((list()) -> expr()).
 list_handler(<<"(">>) -> fun(X) -> X end;
 list_handler(<<"[">>) -> fun vector_handler/1;
 list_handler(<<"{">>) -> fun map_handler/1.
 
-vector_handler(Vec) -> {vector, Vec}.
+-spec vector_handler(Vector :: mal_list()) -> vector().
+vector_handler(Vector) -> {vector, Vector}.
 
+-spec map_handler(Map :: mal_list()) -> map().
 map_handler(Map) -> maps:from_list(propertize(Map)).
 
+-spec propertize(List :: mal_list()) -> [{expr(), expr()}].
 propertize([]) -> [];
 propertize([K, V | Rest]) -> [{K, V} | propertize(Rest)].

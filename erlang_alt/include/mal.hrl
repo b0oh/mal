@@ -1,0 +1,7 @@
+-type bin() :: unicode:unicode_binary().
+-type symbol() :: atom().
+-type mal_string() :: bin().
+-type mal_list() :: [expr()].
+-type vector() :: {vector, mal_list()}.
+-type builtin() :: fun((...) -> expr()).
+-type expr() :: integer() | float() | mal_string() | symbol() | mal_list() | vector() | map() | builtin().
