@@ -9,7 +9,7 @@
 -type expr() :: integer() | float() | mal_string() | symbol() | mal_list() | vector()
               | map() | builtin() | fn().
 
--define(is_atom(Expr), Expr =:= nil; Expr =:= true; Expr =:= false; is_integer(Expr);
-                       is_float(Expr); is_binary(Expr)).
--define(is_builtin(Expr), is_function(Expr, 1)).
 -define(fn(Fn), {fn, _, _, _} = Fn).
+-define(is_builtin(Expr), is_function(Expr, 1)).
+-define(is_mal_atom(Expr), Expr =:= nil; Expr =:= true; Expr =:= false; is_integer(Expr);
+                           is_float(Expr); is_binary(Expr); ?is_builtin(Expr)).

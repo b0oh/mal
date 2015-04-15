@@ -60,7 +60,7 @@ eval(Expr, Env) when is_map(Expr) ->
     {Map, Env};
 eval(['def!', Var, Body], Env) when is_atom(Var) ->
     Val = eval_(Body, Env),
-    {Val, env:update_binding(Var, Val, Env)};
+    {Val, env:set(Var, Val, Env)};
 eval(['def!' | _], _) ->
     throw({error, "syntax error in 'def!'"});
 eval(['let*', {vector, Bindings}, Body], Env) ->
@@ -90,6 +90,6 @@ let_bindings([], Env) ->
     Env;
 let_bindings([Var, Val | Rest], Env) when is_atom(Var) ->
     Val_ = eval_(Val, Env),
-    let_bindings(Rest, env:update_binding(Var, Val_, Env));
+    let_bindings(Rest, env:set(Var, Val_, Env));
 let_bindings(_, _) ->
     throw({error, "syntax error in let*"}).

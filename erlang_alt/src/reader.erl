@@ -17,23 +17,34 @@
 
 -spec read_str(String :: bin()) -> {ok, expr()} | {error, iodata()}.
 read_str(String) ->
-    Tokens0 = re:split(String, ?token_regex),
-    Tokens1 = [T || T <- Tokens0, T =/= <<>>],
-    case Tokens1 of
+    case tokenize(String) of
         [] ->
-            nil;
-        _  ->
-            case read_expr(Tokens1) of
+            {ok, nil};
+        Tokens  ->
+            case read_expr(Tokens) of
                 {ok, Expr, _}  -> {ok, Expr};
                 {error, Error} -> {error, Error}
             end
     end.
 
+-spec tokenize(String :: bin()) -> tokens().
+tokenize(String) ->
+    Tokens = re:split(String, ?token_regex),
+    filter_tokens(Tokens).
+
+-spec filter_tokens(Tokens :: tokens()) -> tokens().
+filter_tokens([]) ->
+    [];
+filter_tokens([<<>> | Tokens]) ->
+    filter_tokens(Tokens);
+filter_tokens([<<C/utf8, _/binary>> | Tokens]) when C =:= $; ->
+    filter_tokens(Tokens);
+filter_tokens([Token | Tokens]) ->
+    [Token | filter_tokens(Tokens)].
+
 -spec read_expr(Tokens :: tokens()) -> reader_result().
 read_expr([]) ->
     ?err("unexpected end of line");
-read_expr([<<";">> | Tokens]) ->
-    ?ok(nil, Tokens);
 read_expr([<<"'">> | Tokens]) ->
     wrap(quote, Tokens);
 read_expr([<<"`">> | Tokens]) ->
@@ -150,7 +161,8 @@ read_string(<<>>, _)  ->
     ?err("expected '\"', but got end of line").
 
 -spec read_symbol(Symbol :: token(), Tokens :: tokens()) -> reader_result().
-read_symbol(Symbol, Tokens) -> ?ok(binary_to_atom(Symbol, utf8), Tokens).
+read_symbol(Symbol, Tokens) ->
+    ?ok(binary_to_atom(Symbol, utf8), Tokens).
 
 -spec close_paren(OpenParen :: token()) -> token().
 close_paren(<<"(">>) -> <<")">>;
@@ -163,11 +175,15 @@ list_handler(<<"[">>) -> fun vector_handler/1;
 list_handler(<<"{">>) -> fun map_handler/1.
 
 -spec vector_handler(Vector :: mal_list()) -> vector().
-vector_handler(Vector) -> {vector, Vector}.
+vector_handler(Vector) ->
+    {vector, Vector}.
 
 -spec map_handler(Map :: mal_list()) -> map().
-map_handler(Map) -> maps:from_list(propertize(Map)).
+map_handler(Map) ->
+    maps:from_list(propertize(Map)).
 
 -spec propertize(List :: mal_list()) -> [{expr(), expr()}].
-propertize([]) -> [];
-propertize([K, V | Rest]) -> [{K, V} | propertize(Rest)].
+propertize([]) ->
+    [];
+propertize([K, V | Rest]) ->
+    [{K, V} | propertize(Rest)].
