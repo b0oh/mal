@@ -1,4 +1,4 @@
--module(step6_file).
+-module(step7_quote).
 -include("mal.hrl").
 -import(core, [readline/1, println/1]).
 -export([repl/1]).
@@ -119,6 +119,14 @@ eval(['fn*' | _], _) ->
 eval([eval, Body], Env0) ->
     {Expr, Env1} = eval(Body, Env0),
     eval(Expr, Env1);
+eval([eval | _], _) ->
+    throw({error, "syntax error in eval"});
+eval([quote, Quoted], Env) ->
+    {Quoted, Env};
+eval([quote | _], _) ->
+    throw({error, "syntax error in quote"});
+eval([quasiquote, Quoted], Env) ->
+    eval(quasiquote(Quoted), Env);
 eval([Fun | Args], Env0) ->
     F = eval_(Fun, Env0),
     A = eval_list(Args, Env0),
@@ -189,6 +197,22 @@ fixerize_fn(Name, {fn, Binds, Body, Env}) ->
     F1 = make_fn([f], [['fn*', [Name], ['fn*', Binds, Body]],
                        ['fn*', Binds, [[f, f] | Binds]]], Env),
     eval_([F0, F1], Env).
+
+-spec quasiquote(Quoted :: expr()) -> expr().
+quasiquote({vector, Vector}) ->
+    quasiquote(Vector);
+quasiquote([unquote, Quoted]) ->
+    Quoted;
+quasiquote([unquote | _]) ->
+    throw({error, "syntax error in unquote"});
+quasiquote([['splice-unquote', X] | Rest]) ->
+    [concat, X, quasiquote(Rest)];
+quasiquote(['splice-unquote' | _]) ->
+    throw({error, "syntax error in splice-unquote"});
+quasiquote([X | Rest]) ->
+    [cons, quasiquote(X), quasiquote(Rest)];
+quasiquote(Expr) ->
+    [quote, Expr].
 
 -spec mal_apply(Fun :: builtin() | fn(), Args :: [expr()]) -> {expr(), env()}.
 mal_apply({fn, {Binds, RestBind}, Body, Env0}, Args0) ->

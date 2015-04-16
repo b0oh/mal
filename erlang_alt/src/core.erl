@@ -7,7 +7,7 @@ readline(Prompt) ->
     io:setopts([{binary, true}, {encoding, utf8}]),
     io:get_line(Prompt).
 
--spec println(String :: bin()) -> ok.
+-spec println(String :: iodata()) -> ok.
 println(String) ->
     io:format("~ts~n", [String]).
 
@@ -16,6 +16,8 @@ add_builtins(Env0) ->
     Builtins = #{count         => fun count/1,
                  'list?'       => fun is_list/1,
                  'empty?'      => fun is_empty/1,
+                 cons          => fun cons/1,
+                 concat        => fun concat/1,
                  'pr-str'      => fun pr_str/1,
                  str           => fun str/1,
                  prn           => fun prn/1,
@@ -48,6 +50,18 @@ is_empty([{vector, Vec}]) ->
     is_empty([Vec]);
 is_empty([List]) ->
     List =:= [].
+
+cons([H, {vector, T}]) ->
+    [H | T];
+cons([H, T]) ->
+    [H | T].
+
+concat([]) ->
+    [];
+concat([{vector, X} | Args]) ->
+    X ++ concat(Args);
+concat([X | Args]) ->
+    X ++ concat(Args).
 
 pr_str(Args) ->
     printer:print_seq(Args, true).
