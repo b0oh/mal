@@ -18,6 +18,9 @@ add_builtins(Env0) ->
                  'empty?'      => fun is_empty/1,
                  cons          => fun cons/1,
                  concat        => fun concat/1,
+                 nth           => fun nth/1,
+                 first         => fun first/1,
+                 rest          => fun rest/1,
                  'pr-str'      => fun pr_str/1,
                  str           => fun str/1,
                  prn           => fun prn/1,
@@ -62,6 +65,31 @@ concat([{vector, X} | Args]) ->
     X ++ concat(Args);
 concat([X | Args]) ->
     X ++ concat(Args).
+
+nth([{vector, Vector}, N]) ->
+    nth([Vector, N]);
+nth([List, N]) ->
+    try lists:nth(N + 1, List)
+    catch
+        error:_ ->
+            throw({error, "nth: out of range"})
+    end.
+
+first([{vector, Vector}]) ->
+    first([Vector]);
+first([[X | _]]) ->
+    X;
+first([nil]) ->
+    nil;
+first([[]]) ->
+    nil.
+
+rest([{vector, Vector}]) ->
+    rest([Vector]);
+rest([[_ | Rest]]) ->
+    Rest;
+rest([[]]) ->
+    [].
 
 pr_str(Args) ->
     printer:print_seq(Args, true).

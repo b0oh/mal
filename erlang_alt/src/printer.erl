@@ -25,6 +25,8 @@ print_expr({vector, Vec}, R) ->
     <<$[, (print_seq(Vec, R))/binary, $]>>;
 print_expr(?fn(_), _) ->
     <<"#<fn>">>;
+print_expr(?macro(_), _) ->
+    <<"#<macro>">>;
 print_expr(Expr, _) when ?is_builtin(Expr) ->
     <<"#<builtin>">>.
 
